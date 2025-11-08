@@ -1,8 +1,40 @@
 from blackjack_game import Blackjack
 
+def blackjack_func() -> None:
+    turns = 0
+    balance = 1500
+    high_balance = 1500
+    print(f'Current Balance: ${balance}')
+    
+    while balance > 0:
+
+        while True:
+            try:
+                wager = int(input("How much do you wager? $"))
+                if wager < 1 or wager > balance:
+                    raise ValueError
+                break
+            except:
+                print("There was an error, write a whole positive integer that is less than your balance.")
+        
+        blackjack = Blackjack()
+        turns += 1
+        blackjack.play()
+        
+        if blackjack.get_victory() == True:
+            balance += wager
+        elif blackjack.get_victory() == False:
+            balance -= wager
+        
+        if balance > high_balance:
+            high_balance = balance
+
+        print(f'\nCurrent Balance: {balance}')
+    
+    print(f'You ran out of money, game over!\n You played {turns} hands.\n You had a maximum of ${high_balance}.')
+
 def main() -> None:
-    blackjack = Blackjack()
-    blackjack.play()
+    blackjack_func()
 
 if __name__ == '__main__':
     main()
