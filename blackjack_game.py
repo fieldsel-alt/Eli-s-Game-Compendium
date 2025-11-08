@@ -1,5 +1,6 @@
 from card_basics.cards_class import Card
 from card_basics.deck import Deck
+from typing import Optional
 
 class Blackjack:
     
@@ -12,10 +13,13 @@ class Blackjack:
         self._handsize: int = 2
         self._hand_sum: int = 0
         self._folded: bool = False
+        self._dealer_sum: int = 0
+        self._victory: Optional[bool] = None
 
     def play(self) -> None:
         self.deal_hand()
         self.prompt_options()
+        self.eval_dealer
     
     def print_hand(self,hands: list[Card]) -> None:
         print ('\n----Hand:----')
@@ -58,6 +62,7 @@ class Blackjack:
             try:
                 if option.lower() in ['1','one','hit','draw']:
                     self._hand.append(self._deck.draw_card())
+                    print(f'Drew {self._hand[-1].name_of_card()}')
                 elif option.lower() in ['2','two','stay','stop']:
                     playing = False
                 elif option.lower() in ['3','three','fold','give up']:
@@ -68,3 +73,77 @@ class Blackjack:
 
             except:
                 print('Please type one of the options given. (1, 2, or 3)')
+
+    def dealer_lost(self) -> bool:
+        self._dealer_sum = 0
+        ace_count = 0
+        for card in self._dealer_hand:
+            if card.get_rank() == 1:
+                ace_count += 1
+            
+            self._dealer_sum += card.get_value()
+
+            
+        while self._dealer_sum  <= 11 and ace_count > 0:
+            self._dealer_sum += 10
+            ace_count -= 1
+
+        if self._dealer_sum > 21:
+            return True
+        else:
+            return False
+
+    def eval_dealer(self) -> None:
+    
+        dealer_total = 0
+        aces = 0
+        for c in self._dealer_hand:
+            dealer_total += c.get_value()
+            if c.get_rank() == 0:
+                aces += 1
+        while dealer_total > 21 and aces:
+            dealer_total -= 10
+            aces -= 1
+
+    
+        while dealer_total < 17:
+            card = self._deck.draw_card()
+            self._dealer_hand.append(card)
+            print("Dealer draws:", card.name_of_card())
+            dealer_total += card.get_value()
+            if card.get_rank() == 0:
+                aces += 1
+            while dealer_total > 21 and aces:
+                dealer_total -= 10
+                aces -= 1
+
+        self._dealer_sum = dealer_total
+
+    
+        if self._folded or self.lost():
+            self._victory = False
+        elif dealer_total > 21:
+            self._victory = True
+        elif self._hand_sum > dealer_total:
+            self._victory = True
+        elif self._hand_sum == dealer_total:
+            self._victory = None
+        else:
+            self._victory = False
+
+    
+        print("\nDealer's final hand:")
+        for c in self._dealer_hand:
+            print(" -", c.name_of_card())
+        print("Dealer total:", self._dealer_sum)
+        print("Your total:", self._hand_sum)
+
+        if self._victory is True:
+            print("You win!")
+        elif self._victory is None:
+            print("Push (tie).")
+        else:
+            print("Dealer wins.")
+
+
+
