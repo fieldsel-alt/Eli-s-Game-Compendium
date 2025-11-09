@@ -2,7 +2,7 @@ from blackjack_game import Blackjack
 
 def blackjack_func() -> None:
     turns = 0
-    balance = 1500
+    balance:float = 1500
     high_balance = 1500
     print(f'Current Balance: ${balance}')
     
@@ -22,7 +22,10 @@ def blackjack_func() -> None:
         blackjack.play()
         
         if blackjack.get_victory() == True:
-            balance += wager
+            if blackjack.get_bj():
+                balance += (wager * 1.5)
+            else:
+                balance += wager
         elif blackjack.get_victory() == False:
             balance -= wager
         

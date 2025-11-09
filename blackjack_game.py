@@ -15,6 +15,7 @@ class Blackjack:
         self._folded: bool = False
         self._dealer_sum: int = 0
         self._victory: Optional[bool] = None
+        self._blackjack: bool = True
 
     def play(self) -> None:
         self.deal_hand()
@@ -59,6 +60,13 @@ class Blackjack:
         playing = True
         while not self.lost() and playing:
             print(f'--Current Hand Sum: {self._hand_sum}--')
+            
+            if self._hand_sum == 21 and len(self._hand) == 2:
+                print("!!!BLACKJACK!!!")
+                self._blackjack = True
+                playing = False
+
+
             option = input('Do you want to: \n1. Hit \n2. Stay \n3. Fold\n ')
             try:
                 if option.lower() in ['1','one','hit','draw']:
@@ -78,7 +86,10 @@ class Blackjack:
             self.lost()
             self.print_hand(self._hand,'Your')
             print(f'--Current Hand Sum: {self._hand_sum}--')
-
+    
+    def get_bj(self) -> bool:
+        return self._blackjack
+    
 
     def dealer_lost(self) -> bool:
         self._dealer_sum = 0
@@ -127,8 +138,9 @@ class Blackjack:
 
         self._dealer_sum = dealer_total
 
-    
-        if self._folded or self.lost():
+        if self._blackjack:
+            self._victory = True
+        elif self._folded or self.lost():
             self._victory = False
         elif dealer_total > 21:
             self._victory = True
