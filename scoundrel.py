@@ -1,109 +1,104 @@
 from card_basics.cards_class import Card
 from card_basics.deck import Deck
 
-class Scoundrel():
+class Scoundrel:
 
     def __init__(self) -> None:
-        
         self._deck = Deck()
         self._deck.shuffle_deck()
-        
         self._row: list[Card] = []
-        
         self._health: int = 20
-
-        self._equip_value:int = 0
-
-        self._durability:int = 0
-
+        self._equip_value: int = 0
+        self._durability: int = 0
         self._equipped: bool = False
 
-    def perform_actions(self, choice:int ) -> None:
-        chosen = self._row.pop(choice-1)
+    def perform_actions(self, choice: int) -> None:
+        chosen = self._row.pop(choice - 1)
 
+        # Healing action
         if chosen.get_suit() == "Hearts":
             self._health += chosen.get_value_face()
             if self._health > 20:
                 self._health = 20
-            print(f"A red tonic sit on a shelf. You drink it; replenishing your health to {self._health}")
+                print('You can\t help but feel as though you may waste some excess.')
+            print(f"A red tonic sits on a shelf. You drink it; replenishing your health to {self._health}.")
 
+        # Equip weapon
         elif chosen.get_suit() == "Diamonds":
             self._equip_value = chosen.get_value_face()
             self._durability = self._equip_value
             self._equipped = True
-            print('A useful weapon lies here. It may prove invaluable.')
+            print("A useful weapon lies here. It may prove invaluable.")
 
+        # Combat
         else:
-            print('A monster attacks!')
+            print("A monster attacks!")
             if self._equipped and self._durability >= chosen.get_value_face():
                 self._durability = chosen.get_value_face()
-                print('You smite the foul beast, your blade grows dull; it may only smite monsters with {self._durability} power.')
-                
+                print(f"You smite the foul beast! Your blade grows dull; it may only smite monsters with {self._durability} power.")
             else:
                 self._health -= chosen.get_value_face()
-                print(f'You smite the foul beast, without a strong enough blade you are reduced to {self._health} health.')
-    
+                print(f"You are wounded! Without a strong enough blade, your health is reduced to {self._health}.")
+
     def create_row(self) -> None:
-
-        for i in range(4-len(self._row)):
+        """Draw up to 4 cards in the chamber."""
+        for _ in range(4 - len(self._row)):
             self._row.append(self._deck.draw_card())
-    
-    def shuffle_row(self) -> None:
 
-        for i in range(4):
-            self._deck.insert(0,self._row.pop())
+    def shuffle_row(self) -> None:
+        """Return all current cards to the deck and reshuffle."""
+        while self._row:
+            card = self._row.pop()
+            self._deck.add_to_top(0, card)  # Make sure your Deck has insert()
+        self._deck.shuffle_deck()
 
     def main_loopable(self) -> None:
-        while self._deck.get_len() > 0:
+        shuffled_last_turn = False
+        print("\nWelcome to Scoundrel!")
+        print('Diamonds are weapons, hearts are health potions'
+        print('and the rest are monsters.'
 
+        while self._deck.get_len() > 0 and self._health > 0:
             self.create_row()
-            shuffled = False
 
-            i = 0
-            print("The chamber contains:")
-            for card in self._row:
-                i += 1
-                print(f'{i}. {card.name_of_card()}')
-            
-        
-            active = True
-            while active:
-                try:
-                    shuffle = input("Do you want to move to another chamber? (You may only do this every other turn.) ")
-                    active = False
-                except:
-                    print("I do not understand, say yes or no.")
-        
-            if shuffled:
-                print('You fled last turn! You muster your waning courage and enter the chamber unchanged. ')
-                shuffled = False
-            elif shuffle.lower() in ['yes','y','yuh','1']:
+            print("\nThe chamber contains:")
+            for i, card in enumerate(self._row, start=1):
+                print(f"{i}. {card.name_of_card()}")
+
+            shuffle_input = input("\nDo you want to move to another chamber? (You may only do this every other turn.) ").lower()
+
+            if shuffled_last_turn:
+                print("You fled last turn! You muster your courage and enter the chamber unchanged.")
+                shuffled_last_turn = False
+            elif shuffle_input in ['yes', 'y', '1']:
                 print("This chamber is too perilous. You turn the corner hoping for better luck.")
-                shuffled = True
-
+                self.shuffle_row()
+                shuffled_last_turn = True
+                continue
             else:
-                print('You steel your neves and enter the chamber unchanged.')
-                shuffled = False
+                print("You steel your nerves and enter the chamber unchanged.")
+                shuffled_last_turn = False
 
-            while not shuffled and len(self._row) > 1:
-            
-                i = 0
-                print("The chamber contains:")
-                for card in self._row:
-                    i += 1
-                    print(f'{i}. {card.name_of_card()}')
-            
-                active = True
-                while active:
-                    try:
-                        choice = int(input('Which room do you enter first? '))
-                        if choice <= len(self._row):
-                            active = False
-                    except:
-                        print('I do not understand, enter the nummber of the room you wish to enter. ')
+            while not shuffled_last_turn and len(self._row) > 1:
+                print("\nThe chamber contains:")
+                for i, card in enumerate(self._row, start=1):
+                    print(f"{i}. {card.name_of_card()}")
 
-                self.perform_actions(choice)
+                try:
+                    choice = int(input("Which room do you enter first? "))
+                    if 1 <= choice <= len(self._row):
+                        self.perform_actions(choice)
+                    else:
+                        print("Please choose a valid room adventurer.")
+                except ValueError:
+                    print("I do not understand, enter the number of the room you wish to enter.")
 
+                if self._health <= 0:
+                    print("\nYou have perished in the dungeon...")
+                    return
+
+        print("\nThe dungeon grows quiet. You have survived your journey!")
 
     def play(self) -> None:
         self.main_loopable()
+

@@ -20,8 +20,8 @@ class Deck:
             card = self._deck[i]
             print(card.name_of_card())
 
-    def insert(self,index: int, value: Card) -> None:
-        self.insert(index,value)
+    def add_to_top(self,index: int, value: Card) -> None:
+        self._deck.insert(index,value)
 
     def get_len(self) -> int:
         return(len(self._deck))
