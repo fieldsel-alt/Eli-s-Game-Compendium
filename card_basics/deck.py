@@ -26,5 +26,7 @@ class Deck:
     def get_len(self) -> int:
         return(len(self._deck))
 
-                
+    def strip_scoundrel(self) -> None:
+        del self._deck[0:13]
+
                 

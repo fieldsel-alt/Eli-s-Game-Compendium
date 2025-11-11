@@ -4,8 +4,12 @@ from card_basics.deck import Deck
 class Scoundrel:
 
     def __init__(self) -> None:
+
         self._deck = Deck()
+        self._deck.strip_scoundrel()
+        
         self._deck.shuffle_deck()
+       
         self._row: list[Card] = []
         self._health: int = 20
         self._equip_value: int = 0
@@ -55,8 +59,9 @@ class Scoundrel:
     def main_loopable(self) -> None:
         shuffled_last_turn = False
         print("\nWelcome to Scoundrel!")
-        print('Diamonds are weapons, hearts are health potions'
-        print('and the rest are monsters.'
+        print('Diamonds are weapons, hearts are health potions')
+        print('and the rest are monsters. Your weapons will degrade')
+        print('with monster attacks. Empty the deck of chambers to win.')
 
         while self._deck.get_len() > 0 and self._health > 0:
             self.create_row()
@@ -89,7 +94,7 @@ class Scoundrel:
                     if 1 <= choice <= len(self._row):
                         self.perform_actions(choice)
                     else:
-                        print("Please choose a valid room adventurer.")
+                        print("Please choose a valid room, adventurer.")
                 except ValueError:
                     print("I do not understand, enter the number of the room you wish to enter.")
 

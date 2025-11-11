@@ -45,8 +45,9 @@ def main() -> None:
     game_choice = input("Hwat Game? ")
     if game_choice.lower() in ['bj','b','black','black jack','blackjack']:
         blackjack_func()
-    else:
+    elif game_choice.lower() in ['sc','s','scoundrel']:
         scoundrel_func()
-
+    else:
+        print('idk')
 if __name__ == '__main__':
     main()
