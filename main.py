@@ -1,9 +1,14 @@
 from blackjack_game import Blackjack
+from scoundrel import Scoundrel
+
+def scoundrel_func() -> None:
+    game_sc = Scoundrel()
+    game_sc.play()
 
 def blackjack_func() -> None:
     turns = 0
     balance:float = 1500
-    high_balance = 1500
+    high_balance:float = 1500
     print(f'Current Balance: ${balance}')
     
     while balance > 0:
@@ -37,7 +42,11 @@ def blackjack_func() -> None:
     print(f'You ran out of money, game over!\n You played {turns} hands.\n You had a maximum of ${high_balance}.')
 
 def main() -> None:
-    blackjack_func()
+    game_choice = input("Hwat Game? ")
+    if game_choice.lower() in ['bj','b','black','black jack','blackjack']:
+        blackjack_func()
+    else:
+        scoundrel_func()
 
 if __name__ == '__main__':
     main()

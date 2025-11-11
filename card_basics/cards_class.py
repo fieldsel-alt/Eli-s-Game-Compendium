@@ -47,3 +47,10 @@ class Card:
         else:
             return 10
 
+    def get_value_face(self) -> int:
+        if self._rank == 0:
+            return 14
+        else:
+            return self._rank + 1
+         
+
