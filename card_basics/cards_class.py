@@ -52,5 +52,13 @@ class Card:
             return 14
         else:
             return self._rank + 1
-         
+    
+    def card_type(self) -> str:
+        if self._suit == 'Diamonds':
+            return 'Weapon'
+        if self._suit == 'Hearts':
+            return 'Healing'
+        else:
+            return 'Monster'
+
 

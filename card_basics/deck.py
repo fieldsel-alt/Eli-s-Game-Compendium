@@ -27,6 +27,7 @@ class Deck:
         return(len(self._deck))
 
     def strip_scoundrel(self) -> None:
-        del self._deck[0:13]
+        del self._deck[11:13]
+        del self._deck [0]
 
                 

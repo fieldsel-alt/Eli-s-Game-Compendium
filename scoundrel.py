@@ -1,7 +1,36 @@
 from card_basics.cards_class import Card
 from card_basics.deck import Deck
-
+import random
 class Scoundrel:
+
+    def message(self, prompt: str) -> None:
+
+        m_list = ['A goblin leaps from the shadows!',
+                'An acidic ooze charges you!',
+                'A skeleton emerges from it\'s grave!',
+                'A mimic forgoes it\'s disguise!',
+                'A giant spider drops from the ceiling',
+                'A reanimated corpse draws it\'s sword!',
+                'A monster attacks!']
+        h_list = [f"A red tonic sits on a shelf. You drink it; your health is replenished to {self._health}.",
+                f'A large feasts sits on a banquet table. You help your self; your health is replensihed to {self._health}.',
+                f'You spy a glowing pool in the corner of this room. You dip your hand in; your health is replenished to {self._health}.',
+                f'A strange green mist is thick in the air. Your health is replenished to {self._health}.']
+
+        w_list = ['A simple sword lies on the ground, it may prove useful.',
+                'An axe is hanging on a rack, it might improve your odds.',
+                'A spear is lodged into the skull of an unlucky adventurer, it may help you avoid sharing their fate.',
+                'A bloodied dagger lies on a table, you hope it isn\'t cursed.',
+                'A broadsword leans against the wall, it has seen better and worse days.']
+        if prompt == 'm':
+            print(random.choice(m_list))
+        elif prompt == 'h':
+            print(random.choice(h_list))
+        elif prompt == 'w':
+            print(random.choice(w_list))
+        else:
+            print('HEY DUMBASS PASS AN ACTUAL ARGUMENT (message function in scoundrel.py) ')
+
 
     def __init__(self) -> None:
 
@@ -25,24 +54,27 @@ class Scoundrel:
             if self._health > 20:
                 self._health = 20
                 print('You can\t help but feel as though you may waste some excess.')
-            print(f"A red tonic sits on a shelf. You drink it; replenishing your health to {self._health}.")
+            self.message('h')
 
         # Equip weapon
         elif chosen.get_suit() == "Diamonds":
             self._equip_value = chosen.get_value_face()
             self._durability = self._equip_value
             self._equipped = True
-            print("A useful weapon lies here. It may prove invaluable.")
+            self.message('w')
 
         # Combat
         else:
-            print("A monster attacks!")
+            self.message('m')
             if self._equipped and self._durability >= chosen.get_value_face():
                 self._durability = chosen.get_value_face()
-                print(f"You smite the foul beast! Your blade grows dull; it may only smite monsters with {self._durability} power.")
+                print(f"You smite the foul beast! Your weapon grows dull; it has {self._durability} power remaining.")
             else:
-                self._health -= chosen.get_value_face()
-                print(f"You are wounded! Without a strong enough blade, your health is reduced to {self._health}.")
+                self._health -= (chosen.get_value_face() - self._durability) 
+                self._durability -= (chosen.get_value_face() - self._durability)
+                if self._durability < 1:
+                    self._durability = 0
+                print(f"You are wounded! Without a strong weapon, your health is reduced to {self._health}.")
 
     def create_row(self) -> None:
         """Draw up to 4 cards in the chamber."""
@@ -59,7 +91,7 @@ class Scoundrel:
     def main_loopable(self) -> None:
         shuffled_last_turn = False
         print("\nWelcome to Scoundrel!")
-        print('Diamonds are weapons, hearts are health potions')
+        print('Diamonds are weapons, hearts are healing')
         print('and the rest are monsters. Your weapons will degrade')
         print('with monster attacks. Empty the deck of chambers to win.')
 
@@ -68,26 +100,45 @@ class Scoundrel:
 
             print("\nThe chamber contains:")
             for i, card in enumerate(self._row, start=1):
-                print(f"{i}. {card.name_of_card()}")
-
-            shuffle_input = input("\nDo you want to move to another chamber? (You may only do this every other turn.) ").lower()
-
-            if shuffled_last_turn:
-                print("You fled last turn! You muster your courage and enter the chamber unchanged.")
-                shuffled_last_turn = False
-            elif shuffle_input in ['yes', 'y', '1']:
-                print("This chamber is too perilous. You turn the corner hoping for better luck.")
-                self.shuffle_row()
-                shuffled_last_turn = True
-                continue
+                print(f"{i}. {card.name_of_card()} ({card.card_type()})")
+            
+            if self._equipped:
+                print(f'Your weapon has {self._durability} power left.')
             else:
-                print("You steel your nerves and enter the chamber unchanged.")
-                shuffled_last_turn = False
+                print(f'You are unarmed.')
+            print(f'You have {self._health} health.')
+
+            while True:
+                shuffle_input = input("\n --- Do you want to move to another chamber? (You may only do this every other turn.) ").lower()
+
+                if shuffled_last_turn:
+                    print("You fled last turn! You muster your courage and enter the chamber unchanged.")
+                    shuffled_last_turn = False
+                    break
+                elif shuffle_input in ['yes', 'y', '1']:
+                    print("This chamber is too perilous. You turn the corner hoping for better luck.")
+                    self.shuffle_row()
+                    shuffled_last_turn = True
+                    break
+                elif shuffle_input in ['no','n','0']:
+                    print("You steel your nerves and enter the chamber unchanged.")
+                    shuffled_last_turn = False
+                    break
+                else:
+                    print('I do not understand, try again.')
 
             while not shuffled_last_turn and len(self._row) > 1:
+                
                 print("\nThe chamber contains:")
                 for i, card in enumerate(self._row, start=1):
-                    print(f"{i}. {card.name_of_card()}")
+                    print(f"{i}. {card.name_of_card()} ({card.card_type()})")
+                
+                if self._equipped:
+                    print(f'Your weapon has {self._durability} power left.')
+                else:
+                    print(f'You are unarmed.')
+
+                print(f'You have {self._health} health.')
 
                 try:
                     choice = int(input("Which room do you enter first? "))
