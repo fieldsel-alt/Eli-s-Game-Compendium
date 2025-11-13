@@ -110,7 +110,7 @@ class Scoundrel:
 
 
 
-    def main_loopable(self) -> None:
+    def chamber_loopable(self) -> None:
         while not self._shuffled_last_turn and len(self._row) > 1:
                 
             self.print_chamber()
@@ -128,36 +128,46 @@ class Scoundrel:
                 print("\nYou have perished in the dungeon...")
                 return
 
-        print("\nThe dungeon grows quiet. You have survived your journey!")
-
-    def play(self) -> None:
+            
+    def tutorial(self) -> None:
         print("\nWelcome to Scoundrel!")
         print('Diamonds are weapons, hearts are healing')
         print('and the rest are monsters. Your weapons will degrade')
         print('with monster attacks. Empty the deck of chambers to win.')
+        # WIP better explanation
 
+
+    def main_options(self) -> None:
         while self._deck.get_len() > 0 and self._health > 0:
+            active = True
             self.create_row()
             self.print_chamber()
 
-            while True:
+            while active:
                 shuffle_input = input("\n --- Do you want to move to another chamber? (You may only do this every other turn.) ").lower()
 
                 if self._shuffled_last_turn:
                     print("You fled last turn! You muster your courage and enter the chamber unchanged.")
-                    shuffled_last_turn = False
-                    break
+                    self._shuffled_last_turn = False
+                    active = False
                 elif shuffle_input in ['yes', 'y', '1']:
                     print("This chamber is too perilous. You turn the corner hoping for better luck.")
                     self.shuffle_row()
                     self._shuffled_last_turn = True
-                    break
+                    active = False
                 elif shuffle_input in ['no','n','0']:
                     print("You steel your nerves and enter the chamber unchanged.")
                     self._shuffled_last_turn = False
-                    break
+                    active = False
                 else:
                     print('I do not understand, try again.')
-                
-                self.main_loopable()
 
+            self.chamber_loopable
+        
+        print("\nThe dungeon grows quiet. You have survived your journey!")
+
+                
+    def play(self) -> None:
+        self.tutorial()
+        self.main_options()
+ 
