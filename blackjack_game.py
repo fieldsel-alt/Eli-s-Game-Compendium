@@ -15,7 +15,7 @@ class Blackjack:
         self._folded: bool = False
         self._dealer_sum: int = 0
         self._victory: Optional[bool] = None
-        self._blackjack: bool = True
+        self._blackjack: bool = False
 
     def play(self) -> None:
         self.deal_hand()
