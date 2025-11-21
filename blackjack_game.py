@@ -58,15 +58,18 @@ class Blackjack:
 
     def prompt_options(self) -> None:
         playing = True
+
+
         while not self.lost() and playing:
             print(f'--Current Hand Sum: {self._hand_sum}--')
-            
+
+            # Detects Blackjack
             if self._hand_sum == 21 and len(self._hand) == 2:
                 print("!!!BLACKJACK!!!")
                 self._blackjack = True
                 playing = False
 
-
+            #Option prompting
             option = input('Do you want to: \n1. Hit \n2. Stay \n3. Fold\n ')
             try:
                 if option.lower() in ['1','one','hit','draw']:
@@ -82,6 +85,8 @@ class Blackjack:
 
             except:
                 print('Please type one of the options given. (1, 2, or 3)')
+
+        #Prints final layout/stats
         if not playing:
             self.lost()
             self.print_hand(self._hand,'Your')
@@ -94,17 +99,19 @@ class Blackjack:
     def dealer_lost(self) -> bool:
         self._dealer_sum = 0
         ace_count = 0
+
+        #ace detection
         for card in self._dealer_hand:
             if card.get_value() == 1:
                 ace_count += 1
             
             self._dealer_sum += card.get_value()
 
-            
         while self._dealer_sum  <= 11 and ace_count > 0:
             self._dealer_sum += 10
             ace_count -= 1
-
+        
+        # checks if dealer bust
         if self._dealer_sum > 21:
             return True
         else:
@@ -114,27 +121,32 @@ class Blackjack:
         
         dealer_total = 0
         aces = 0
-        for c in self._dealer_hand:
-            dealer_total += c.get_value()
-            if c.get_rank() == 0:
+
+        # ace detection
+        for card in self._dealer_hand:
+            dealer_total += card.get_value()
+            if card.get_rank() == 0:
                 aces += 1
         while dealer_total > 21 and aces:
             dealer_total -= 10
             aces -= 1
-
-    
+        
+        # dealer play mechanics
         while dealer_total < 17:
             card = self._deck.draw_card()
             self._dealer_hand.append(card)
             print("\nDealer draws:", card.name_of_card())
+
             self.print_hand(self._dealer_hand,'Dealer\'s')
             dealer_total += card.get_value()
             print(f'--Current Hand Sum: {dealer_total}--')
+
             if card.get_rank() == 0:
                 aces += 1
             while dealer_total > 21 and aces:
                 dealer_total -= 10
                 aces -= 1
+        
 
         self._dealer_sum = dealer_total
 

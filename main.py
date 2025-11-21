@@ -1,6 +1,22 @@
 from blackjack_game import Blackjack
 from scoundrel import Scoundrel
 
+def print_opening() -> None:
+    print ("""
+    =================================
+    ||                             ||
+    ||   Welcome to Eli's Awesome  ||
+    ||                             ||
+    ||       GAME COMPENDIUM       ||
+    ||                             ||
+    =================================
+    """)
+
+def print_games() -> None:
+    game_list = ['Blackjack','Scoundrel']
+    for index, game in enumerate(game_list):
+        print(f'{index+1}.) {game}')
+
 def scoundrel_func() -> None:
     game_sc = Scoundrel()
     game_sc.play()
@@ -42,10 +58,15 @@ def blackjack_func() -> None:
     print(f'You ran out of money, game over!\n You played {turns} hands.\n You had a maximum of ${high_balance}.')
 
 def main() -> None:
-    game_choice = input("Hwat Game? ")
-    if game_choice.lower() in ['bj','b','black','black jack','blackjack']:
+
+    print_opening()
+    print_games()
+
+    game_choice = input("\nWhat Game Would You Like To Play? ")
+    
+    if game_choice.lower() in ['bj','b','black','black jack','blackjack','1']:
         blackjack_func()
-    elif game_choice.lower() in ['sc','s','scoundrel']:
+    elif game_choice.lower() in ['sc','s','scoundrel','2']:
         scoundrel_func()
     else:
         print('idk')
