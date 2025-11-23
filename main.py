@@ -41,7 +41,8 @@ def blackjack_func() -> None:
         blackjack = Blackjack()
         turns += 1
         blackjack.play()
-        
+        input('Press Enter to continue...')
+
         if blackjack.get_victory() == True:
             if blackjack.get_bj():
                 balance += (wager * 1.5)
