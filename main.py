@@ -59,17 +59,30 @@ def blackjack_func() -> None:
     print(f'You ran out of money, game over!\n You played {turns} hands.\n You had a maximum of ${high_balance}.')
 
 def main() -> None:
-
+    playing = True
+    attempt_ask_play = True
     print_opening()
     print_games()
-
-    game_choice = input("\nWhat Game Would You Like To Play? ")
     
-    if game_choice.lower() in ['bj','b','black','black jack','blackjack','1']:
-        blackjack_func()
-    elif game_choice.lower() in ['sc','s','scoundrel','2']:
-        scoundrel_func()
-    else:
-        print('idk')
+    while playing:
+        game_choice = input("\nWhat Game Would You Like To Play? ")
+    
+        if game_choice.lower() in ['bj','b','black','black jack','blackjack','1']:
+            blackjack_func()
+        elif game_choice.lower() in ['sc','s','scoundrel','2']:
+            scoundrel_func()
+        else:
+            print('idk')
+
+        while attempt_ask_play:
+            play_in = input("Would you like to play again? \n  1. Yes \n  2. No \n")
+            if play_in.lower() in ['y','yes','1','one']:
+                attempt_ask_play = False
+            elif play_in.lower() in ['n','no','2','two']:
+                playing = False
+                attempt_ask_pllay = False
+            else:
+                print('I don\'t understand ')
+
 if __name__ == '__main__':
     main()
