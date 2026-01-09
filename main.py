@@ -77,10 +77,11 @@ def main() -> None:
         while attempt_ask_play:
             play_in = input("Would you like to play again? \n  1. Yes \n  2. No \n")
             if play_in.lower() in ['y','yes','1','one']:
+                playing = True
                 attempt_ask_play = False
             elif play_in.lower() in ['n','no','2','two']:
                 playing = False
-                attempt_ask_pllay = False
+                attempt_ask_play = False
             else:
                 print('I don\'t understand ')
 

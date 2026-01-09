@@ -26,15 +26,15 @@ class Scoundrel:
                   'A giant spider drops from the ceiling',
                   'A reanimated corpse draws its sword!',
                   'Briny tentacles burst through the walls!',
-                  'A horde of devilish impa charge you!'
+                  'A horde of devilish imps charge you!',
                   'A monster attacks!']
 
         h_list = [f"A red tonic sits on a shelf. You drink it; your health is replenished to {self._health}.",
                   f'A large feast sits on a banquet table. You help yourself; your health is replenished to {self._health}.',
-                  f'You spy a glowing pool in the corner of this room. You dip your hand in; your health is replenished to {self._health}.',
+                  f'You spy a glowing pool in the corner of this room. You cautiosly dip in; your health is replenished to {self._health}.',
                   f'A strange green mist is thick in the air. Your health is replenished to {self._health}.',
-                  f'A collection of strange herbs grow in the corner of this chamber. They taste bitter and replenish you to {self._health} health.',
-                  f'A strange person charges you with a needle. As the conconction is forcifully injected your health is replenished to {self._health}']
+                  f'A collection of strange herbs grow in the corner of this chamber. Their bitter taste replenishes you to {self._health} health.',
+                  f'A strange person charges you with a needle. As you are forcifully injected your health is replenished to {self._health}']
 
         w_list = ['A simple shortsword lies on the ground, it may prove useful.',
                   'An axe is hanging on a rack, it might improve your odds.',
