@@ -12,6 +12,7 @@ class Scoundrel:
         self._row: list[Card] = []
 
         self._health: int = 20
+        self._max_health: int = 20
         self._equip_value: int = 0
         self._durability: int = 0
         self._equipped: bool = False
@@ -19,21 +20,36 @@ class Scoundrel:
         self._shuffled_last_turn: bool = False
 
     def message(self, prompt: str) -> None:
-        m_list = ['A goblin leaps from the shadows!',
-                  'An acidic ooze charges you!',
-                  'A skeleton emerges from its grave!',
+        m_easy_list = [
+                'A goblin leaps from the shadows!',
+                'Rats swarm the chamber!',
+                'An acidic ooze charges you!',
+                'A monster attacks!',
+                'A wild beast decides you\'re its next meal!'
+                ]
+        m_medium_list = [
+                 'A skeleton emerges from its grave!',
                   'A mimic forgoes its disguise!',
                   'A giant spider drops from the ceiling',
                   'A reanimated corpse draws its sword!',
                   'Briny tentacles burst through the walls!',
                   'A horde of devilish imps charge you!',
-                  'A monster attacks!']
+                  'A ghostly visage appears in front of you!'
+                  ]
+
+        m_hard_list = [
+                    'Your own shadow begins to rebel!',
+                    'An unseen assasin presses their knife to your throat!',
+                    'A divine light begins to burn your flesh',
+                    'You happen upon a lich\'s phylactery, your intrusion is noticed.',
+                    'The chamber walls sprout eyes, limbs, and mouths. You are surrounded!'
+                        ]
 
         h_list = [f"A red tonic sits on a shelf. You drink it; your health is replenished to {self._health}.",
                   f'A large feast sits on a banquet table. You help yourself; your health is replenished to {self._health}.',
-                  f'You spy a glowing pool in the corner of this room. You cautiosly dip in; your health is replenished to {self._health}.',
+                  f'A glowing pool sits in the corner of this room. You cautiosly dip in; your health is replenished to {self._health}.',
                   f'A strange green mist is thick in the air. Your health is replenished to {self._health}.',
-                  f'A collection of strange herbs grow in the corner of this chamber. Their bitter taste replenishes you to {self._health} health.',
+                  f'Strange herbs grow in the corner of the chamber. Their bitter taste replenishes you to {self._health} health.',
                   f'A strange person charges you with a needle. As you are forcifully injected your health is replenished to {self._health}']
 
         w_list = ['A simple shortsword lies on the ground, it may prove useful.',
@@ -43,8 +59,12 @@ class Scoundrel:
                   'A broadsword leans against the wall, it has seen better and worse days.',
                   'A large hammer glints inside of a nearby chest, it will serve you well.']
 
-        if prompt == 'm':
-            print(random.choice(m_list))
+        if prompt == 'm_h':
+            print(random.choice(m_hard_list))
+        elif prompt == 'm_m':
+            print(random.choice(m_medium_list))
+        elif prompt == 'm_e':
+            print(random.choice(m_easy_list))
         elif prompt == 'h':
             print(random.choice(h_list))
         elif prompt == 'w':
@@ -58,8 +78,8 @@ class Scoundrel:
         # Healing action
         if chosen.get_suit() == "Hearts":
             self._health += chosen.get_value_face()
-            if self._health > 20:
-                self._health = 20
+            if self._health > self._max_health:
+                self._health = self._max_health
                 self.message('h')
                 print('You feel some excess energy go to waste.')
             else:
@@ -77,8 +97,15 @@ class Scoundrel:
 
         # Combat
         else:
-            self.message('m')
             monster_value = chosen.get_value_face()
+
+            if monster_value <= 4:        #prints message based on strength of monster
+                self.message('m_e')
+            elif monster_value >= 11:
+                self.message('m_h')
+            else:
+                self.message('m_m')
+
             if self._equipped and self._durability > 0:
                 damage = min(monster_value, self._durability)
                 self._durability -= damage
@@ -108,7 +135,7 @@ class Scoundrel:
         self._deck.shuffle_deck()
 
     def print_chamber(self) -> None:
-        print("\nThe chamber contains:")
+        print(f"\n{self._deck.get_len()} rooms remaining\nThe chamber contains:")
         for i, card in enumerate(self._row, start=1):
             print(f"{i}. {card.name_of_card()} ({card.card_type()})")
 
@@ -123,7 +150,7 @@ class Scoundrel:
         while not self._shuffled_last_turn and len(self._row) > 1:
             self.print_chamber()
             try:
-                choice = int(input("Which room do you enter first? "))
+                choice = int(input(f"Which room do you enter first? "))
                 if 1 <= choice <= len(self._row):
                     self.perform_actions(choice)
                 else:
@@ -168,6 +195,11 @@ class Scoundrel:
                         print("You steel your nerves and enter the chamber unchanged.")
                         self._shuffled_last_turn = False
                         active = False
+                    elif shuffle_input == "debug_god_mode":
+                        self._equipped = True
+                        self._max_health = 999999999
+                        self._health = 999999999
+                        self._durability = 999999999
                     else:
                         print('I do not understand, try again.')
 
