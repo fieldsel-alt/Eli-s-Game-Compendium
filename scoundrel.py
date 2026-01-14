@@ -36,7 +36,6 @@ class Scoundrel:
                   'A horde of devilish imps charge you!',
                   'A ghostly visage appears in front of you!'
                   ]
-
         m_hard_list = [
                     'Your own shadow begins to rebel!',
                     'An unseen assasin presses their knife to your throat!',
@@ -45,12 +44,21 @@ class Scoundrel:
                     'The chamber walls sprout eyes, limbs, and mouths. You are surrounded!'
                         ]
 
-        h_list = [f"A red tonic sits on a shelf. You drink it; your health is replenished to {self._health}.",
-                  f'A large feast sits on a banquet table. You help yourself; your health is replenished to {self._health}.',
-                  f'A glowing pool sits in the corner of this room. You cautiosly dip in; your health is replenished to {self._health}.',
-                  f'A strange green mist is thick in the air. Your health is replenished to {self._health}.',
-                  f'Strange herbs grow in the corner of the chamber. Their bitter taste replenishes you to {self._health} health.',
-                  f'A strange person charges you with a needle. As you are forcifully injected your health is replenished to {self._health}']
+        h_hard_list = [
+                    f'You happen across another adventurer, you share stories and a meal. Your health is replensihed to {self._health}.',
+                    f'A large feast sits on a banquet table. You help yourself; your health is replenished to {self._health}.',
+                    f'A glowing pool sits in the corner of this room. You cautiosly dip in; your health is replenished to {self._health}.',
+                    f'A strange green mist is thick in the air. As you inhale your health is replenished to {self._health}.',
+                    f'A strange person charges you with a needle. As you are forcifully injected your health is replenished to {self._health}',
+                    f'A bodiless hand sits next to a leather flask. You squeeze the contents of the flask onto your wounds; replenishing your health to {self._health}.'
+                    ]
+        h_easy_list = [
+                    f'A red tonic sits on a shelf. You drink it; your health is replenseshied to {self._health}.'
+                    f'Strange herbs grow in the corner of the chamber. Their bitter taste replenishes you to {self._health} health.',
+                    f'A forsaken backpack spills onto the floor. Expired salves, once hidden inside, replenish you to {self._health}.',
+                    f'Intruding roots poke through the roof, although they have unpleasant flavor they replenish you to {self._health}.}',
+                    f'You discover a small loft hidden in a chamber. You rest for a mere moment replenishing your health to {self._health}.'
+                    ]
 
         w_list = ['A simple shortsword lies on the ground, it may prove useful.',
                   'An axe is hanging on a rack, it might improve your odds.',
@@ -65,8 +73,10 @@ class Scoundrel:
             print(random.choice(m_medium_list))
         elif prompt == 'm_e':
             print(random.choice(m_easy_list))
-        elif prompt == 'h':
-            print(random.choice(h_list))
+        elif prompt == 'h_h':
+            print(random.choice(h_hard_list))
+        elif prompt == 'h_e'
+            print(random.choice(h_easy_list))
         elif prompt == 'w':
             print(random.choice(w_list))
         else:
@@ -80,10 +90,17 @@ class Scoundrel:
             self._health += chosen.get_value_face()
             if self._health > self._max_health:
                 self._health = self._max_health
-                self.message('h')
+                if chosen.get_value_face() > 8:
+                    self.message('h_h')
+                else:
+                    self.message('h_e')
                 print('You feel some excess energy go to waste.')
             else:
-                self.message('h')
+                if chosen.get_value_face() > 8:
+                    self.message('h_h')
+                else:
+                    self.message('h_e')
+
             
             input("\nPress Enter to continue...\n ")
 
@@ -186,12 +203,12 @@ class Scoundrel:
                 
                     shuffle_input = input("Do you want to move to another chamber? (You may only do this every other turn.) ")
 
-                    if shuffle_input.lower() in ['yes', 'y', '1']:
+                    if shuffle_input.lower() in ['yes', 'y']:
                         print("This chamber is too perilous. You turn the corner hoping for better luck.")
                         self.shuffle_row()
                         self._shuffled_last_turn = True
                         active = False
-                    elif shuffle_input.lower() in ['no', 'n', '0']:
+                    elif shuffle_input.lower() in ['no', 'n']:
                         print("You steel your nerves and enter the chamber unchanged.")
                         self._shuffled_last_turn = False
                         active = False
@@ -200,6 +217,10 @@ class Scoundrel:
                         self._max_health = 999999999
                         self._health = 999999999
                         self._durability = 999999999
+                    elif shuffle_input == "debug_empty_chamber":
+                        while self._deck.get_len() >= 4:
+                            dump = []
+                            dump.append(self._deck.draw_card())
                     else:
                         print('I do not understand, try again.')
 
