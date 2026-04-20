@@ -114,7 +114,7 @@ class Blackjack:
         # Ace detection
         for card in self._dealer_hand:
             dealer_total += card.get_value()
-            if card.get_rank() == 0:  # assuming rank 0 == Ace
+            if card.get_rank() == 0:  # rank 0 == Ace
                 aces += 1
 
         while dealer_total > 21 and aces:
@@ -132,7 +132,7 @@ class Blackjack:
             dealer_total += card.get_value()
             if card.get_rank() == 0:
                 aces += 1
-            while dealer_total > 21 and aces:
+            while dealer_total > 21 and aces > 0:
                 dealer_total -= 10
                 aces -= 1
 

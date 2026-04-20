@@ -25,7 +25,8 @@ class Scoundrel:
                 'Rats swarm the chamber!',
                 'An acidic ooze charges you!',
                 'A monster attacks!',
-                'A wild beast decides you\'re its next meal!'
+                'A wild beast decides you\'re its next meal!',
+                'You have disturbed an enspecially large hive!'
                 ]
         m_medium_list = [
                  'A skeleton emerges from its grave!',
@@ -34,38 +35,53 @@ class Scoundrel:
                   'A reanimated corpse draws its sword!',
                   'Briny tentacles burst through the walls!',
                   'A horde of devilish imps charge you!',
-                  'A ghostly visage appears in front of you!'
+                  'A ghostly visage appears in front of you!',
+                  'An ogre decides you are a worthy challenger!'
                   ]
         m_hard_list = [
                     'Your own shadow begins to rebel!',
                     'An unseen assasin presses their knife to your throat!',
                     'A divine light begins to burn your flesh',
                     'You happen upon a lich\'s phylactery, your intrusion is noticed.',
-                    'The chamber walls sprout eyes, limbs, and mouths. You are surrounded!'
+                    'The chamber walls sprout eyes, limbs, and mouths. You are surrounded!',
+                    'An abnormally large Cyclops decides you look especially delicous!'
                         ]
 
         h_hard_list = [
-                    f'You happen across another adventurer, you share stories and a meal. Your health is replensihed to {self._health}.',
-                    f'A large feast sits on a banquet table. You help yourself; your health is replenished to {self._health}.',
-                    f'A glowing pool sits in the corner of this room. You cautiosly dip in; your health is replenished to {self._health}.',
-                    f'A strange green mist is thick in the air. As you inhale your health is replenished to {self._health}.',
-                    f'A strange person charges you with a needle. As you are forcifully injected your health is replenished to {self._health}',
-                    f'A bodiless hand sits next to a leather flask. You squeeze the contents of the flask onto your wounds; replenishing your health to {self._health}.'
+                    f'You happen across another adventurer, you share some stories and a meal.',
+                    f'A large feast sits on a banquet table. You help yourself.',
+                    f'A glowing pool sits in the corner of this room. You cautiosly dip in.',
+                    f'A strange green mist is thick in the air. As you inhale your health is replenished.',
+                    f'A strange person charges you with a needle. Your wounds begin to close before your eyes.',
+                    f'An armless hand grips a leather flask. You pour the contents of the flask onto your wounds.'
                     ]
         h_easy_list = [
-                    f'A red tonic sits on a shelf. You drink it; your health is replenseshied to {self._health}.'
-                    f'Strange herbs grow in the corner of the chamber. Their bitter taste replenishes you to {self._health} health.',
-                    f'A forsaken backpack spills onto the floor. Expired salves, once hidden inside, replenish you to {self._health}.',
-                    f'Intruding roots poke through the roof, although they have unpleasant flavor they replenish you to {self._health}.}',
-                    f'You discover a small loft hidden in a chamber. You rest for a mere moment replenishing your health to {self._health}.'
+                    f'You grab a red tonic sitting on a shelf.',
+                    f'Strange herbs grow in the corner of the chamber. Their bitter taste reminds you of their medicinal nature.',
+                    f'A forgotten backpack spills onto the floor. Expired salves, once hidden inside, replenish you.',
+                    f'Intruding roots poke through the roof, although they have unpleasant flavor you feel your energy return.',
+                    f'You discover a small loft hidden in a chamber. You rest for a mere moment.'
                     ]
 
-        w_list = ['A simple shortsword lies on the ground, it may prove useful.',
+        w_medium_list = ['A simple shortsword lies on the ground, it may prove useful.',
                   'An axe is hanging on a rack, it might improve your odds.',
                   'A spear is lodged into the skull of an unlucky adventurer, it may help you avoid sharing their fate.',
-                  'A bloodied dagger lies on a table, you hope it isn\'t cursed.',
-                  'A broadsword leans against the wall, it has seen better and worse days.',
-                  'A large hammer glints inside of a nearby chest, it will serve you well.']
+                  'A bloody room houses a longbow and a few arrows, hopefully you can put them to better use.'
+                  ]
+        w_hard_list = [
+                    'A gilded broadsword leans against the wall, it has seen better and worse days.',
+                    'A large hammer glints inside of a nerby chest, it will serve you well.',
+                    'In the middle of the room a crossbow sits upon a pedastol, it will pierce any fiend you happen upon.',
+                    'A shield is mounted on the wall, the blades embedded in its edges will surely slice any opponent.'
+                ]
+
+        w_easy_list = [
+                    'A bloodied dagger lies on a table, you hope it isn\'t cursed.',
+                    'You find a large brick dislodged from the wall, it will have to do.',
+                    'A broken sword lays on the ground, it was clearly discarded by someone more fortunate.',
+                    'A crude club is laid next to a slain ogre, it won\'t mind if you help yourself.'
+
+                ]
 
         if prompt == 'm_h':
             print(random.choice(m_hard_list))
@@ -75,10 +91,14 @@ class Scoundrel:
             print(random.choice(m_easy_list))
         elif prompt == 'h_h':
             print(random.choice(h_hard_list))
-        elif prompt == 'h_e'
+        elif prompt == 'h_e':
             print(random.choice(h_easy_list))
-        elif prompt == 'w':
-            print(random.choice(w_list))
+        elif prompt == 'w_h':
+            print(random.choice(w_hard_list))
+        elif prompt == 'w_m' :
+            print(random.choice(w_medium_list))
+        elif prompt == 'w_e':
+            print(random.choice(w_easy_list))
         else:
             print('HEY PASS AN ACTUAL ARGUMENT!')
 
@@ -109,7 +129,14 @@ class Scoundrel:
             self._equip_value = chosen.get_value_face()
             self._durability = self._equip_value
             self._equipped = True
-            self.message('w')
+
+            if self._equip_value <= 4:
+                self.message('w_e')
+            elif self._equip_value >= 11:
+                self.message('w_h')
+            else:
+                self.message('w_m')
+
             input("\nPress Enter to continue...\n ")
 
         # Combat
@@ -221,6 +248,8 @@ class Scoundrel:
                         while self._deck.get_len() >= 4:
                             dump = []
                             dump.append(self._deck.draw_card())
+                    elif shuffle_input == 'debug_omniscience':
+                        print(Deck()) #<-- doesnt work as intended
                     else:
                         print('I do not understand, try again.')
 

@@ -62,9 +62,10 @@ def main() -> None:
     playing = True
     attempt_ask_play = True
     print_opening()
-    print_games()
-    
+        
     while playing:
+        
+        print_games()
         game_choice = input("\nWhat Game Would You Like To Play? ")
     
         if game_choice.lower() in ['bj','b','black','black jack','blackjack','1']:
@@ -73,7 +74,8 @@ def main() -> None:
             scoundrel_func()
         else:
             print('idk')
-
+        
+        attempt_ask_play = True
         while attempt_ask_play:
             play_in = input("Would you like to play again? \n  1. Yes \n  2. No \n")
             if play_in.lower() in ['y','yes','1','one']:
