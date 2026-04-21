@@ -13,79 +13,72 @@ def print_opening() -> None:
     """)
 
 def print_games() -> None:
-    game_list = ['Blackjack','Scoundrel']
+    game_list = ['Blackjack', 'Scoundrel']
     for index, game in enumerate(game_list):
         print(f'{index+1}.) {game}')
 
 def scoundrel_func() -> None:
-    game_sc = Scoundrel()
-    game_sc.play()
+    Scoundrel().play()
 
 def blackjack_func() -> None:
     turns = 0
-    balance:float = 1500
-    high_balance:float = 1500
-    print(f'Current Balance: ${balance}')
+    balance = 1500.0
+    high_balance = 1500.0
     
     while balance > 0:
-
-        while True:
-            try:
-                wager = int(input("How much do you wager? $"))
-                if wager < 1 or wager > balance:
-                    raise ValueError
-                break
-            except:
-                print("There was an error, write a whole positive integer that is less than your balance.")
+        print(f'\nCurrent Balance: ${balance}')
+        try:
+            wager_input = input("How much do you wager? $")
+            wager = int(wager_input)
+            if wager < 1 or wager > balance:
+                print(f"Please wager between $1 and ${balance}")
+                continue
+        except ValueError:
+            print("Invalid input. Please enter a whole number.")
+            continue
         
-        blackjack = Blackjack()
+        game = Blackjack()
         turns += 1
-        blackjack.play()
-        input('Press Enter to continue...')
-
-        if blackjack.get_victory() == True:
-            if blackjack.get_bj():
-                balance += (wager * 1.5)
-            else:
-                balance += wager
-        elif blackjack.get_victory() == False:
-            balance -= wager
+        game.play()
         
-        if balance > high_balance:
-            high_balance = balance
-
-        print(f'\nCurrent Balance: {balance}')
+        # Calculate result
+        result = game.get_victory()
+        if result is True:
+            reward = wager * 1.5 if game.get_bj() else wager
+            balance += reward
+            print(f"Winner! +${reward}")
+        elif result is False:
+            balance -= wager
+            print(f"Lost! -${wager}")
+        else:
+            print("Push. Wager returned.")
+        
+        if balance > high_balance: high_balance = balance
+        input('Press Enter to continue...')
     
-    print(f'You ran out of money, game over!\n You played {turns} hands.\n You had a maximum of ${high_balance}.')
+    print(f'\nGame Over! Hands: {turns}. Peak Balance: ${high_balance}.')
 
 def main() -> None:
-    playing = True
-    attempt_ask_play = True
     print_opening()
+    # FIXED: Using a dictionary for game selection
+    game_map = {
+        '1': blackjack_func, 'bj': blackjack_func, 'blackjack': blackjack_func,
+        '2': scoundrel_func, 'sc': scoundrel_func, 'scoundrel': scoundrel_func
+    }
         
-    while playing:
-        
+    while True:
         print_games()
-        game_choice = input("\nWhat Game Would You Like To Play? ")
-    
-        if game_choice.lower() in ['bj','b','black','black jack','blackjack','1']:
-            blackjack_func()
-        elif game_choice.lower() in ['sc','s','scoundrel','2']:
-            scoundrel_func()
-        else:
-            print('idk')
+        choice = input("\nWhat Game Would You Like To Play? ").lower()
         
-        attempt_ask_play = True
-        while attempt_ask_play:
-            play_in = input("Would you like to play again? \n  1. Yes \n  2. No \n")
-            if play_in.lower() in ['y','yes','1','one']:
-                playing = True
-                attempt_ask_play = False
-            elif play_in.lower() in ['n','no','2','two']:
-                playing = False
-                attempt_ask_play = False
-            else:
-                print('I don\'t understand ')
+        if choice in game_map:
+            game_map[choice]()
+        else:
+            print("Selection not recognized.")
+        
+        play_again = input("\nReturn to Compendium Menu? (y/n): ").lower()
+        if play_again not in ['y', 'yes', '1']:
+            print("Thanks for playing!")
+            break
 
 if __name__ == '__main__':
     main()
