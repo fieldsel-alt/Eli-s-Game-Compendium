@@ -1,16 +1,16 @@
 class Card:
-    # Use a class-level list for efficient rank mapping
     RANKS = ["Ace", "Two", "Three", "Four", "Five", "Six", "Seven", 
              "Eight", "Nine", "Ten", "Jack", "Queen", "King"]
 
-    def __init__(self, rank: int, suit: str) -> None:
-        # FIXED: Corrected the swapped suit/rank assignment
+    def __init__(self, rank: int, suit: str, is_joker: bool = False) -> None:
         self._rank: int = rank
         self._suit: str = suit
+        self._is_joker: bool = is_joker 
 
     def name_of_card(self) -> str:
-        # FIXED: Simplified lookup using list indexing
-        if 0 <= self._rank < len(self.RANKS):
+        if self._is_joker:
+            name_rank = 'Joker'
+        elif 0 <= self._rank < len(self.RANKS):
             name_rank = self.RANKS[self._rank]
         else:
             name_rank = str(self._rank + 1)
@@ -22,8 +22,11 @@ class Card:
     def get_suit(self) -> str:
         return self._suit
 
+    def is_joker(self) -> bool:
+        return self._is_joker
+
     def get_value(self) -> int:
-        """Standard values for Blackjack (Face cards = 10)."""
+        """Standard values for Blackjack."""
         if self._rank < 9:
             return self._rank + 1
         else:
@@ -37,9 +40,11 @@ class Card:
             return self._rank + 1
     
     def card_type(self) -> str:
+        if self._is_joker:
+            return 'Mystery'
         if self._suit == 'Diamonds':
             return 'Weapon'
-        if self._suit == 'Hearts':
+        elif self._suit == 'Hearts':
             return 'Healing'
         else:
             return 'Monster'

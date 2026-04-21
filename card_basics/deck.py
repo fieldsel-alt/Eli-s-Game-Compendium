@@ -1,5 +1,7 @@
 from card_basics.cards_class import Card
 from random import shuffle
+import random # Add this import at the top
+
 
 class Deck:
     def __init__(self) -> None:
@@ -7,8 +9,11 @@ class Deck:
         suits = ("Hearts", "Diamonds", "Clubs", "Spades")
         for suit in suits:
             for rank in range(13):
-                self._deck.append(Card(rank, suit))
-
+                # 1% chance for each card to become a Joker
+                is_joker = random.random() < 0.04 # 4%
+                self._deck.append(Card(rank, suit, is_joker))
+    
+    # ... keep the rest of the Deck methods the same ...
     def shuffle_deck(self) -> None:
         shuffle(self._deck)
 

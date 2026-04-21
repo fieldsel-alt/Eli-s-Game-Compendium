@@ -16,9 +16,32 @@ class Scoundrel:
         self._equip_value: int = 0
         self._durability: int = 0
         self._equipped: bool = False
+        self._heal_bonus: int = 0
+        self._dura_bonus: int = 0
+        self._cursed: bool = False
+        self._on_fire: int = 0
 
         self._shuffled_last_turn: bool = False
 
+
+
+    def _add_monsters_to_deck(self, count: int) -> None:
+        """Creates new monster cards and shuffles them into the deck."""
+        monster_suits = ["Clubs", "Spades"]
+    
+        for _ in range(count):
+            # Generate a random rank (1-10 to stay within standard monster values)
+            rank = random.randint(1, 10)
+            suit = random.choice(monster_suits)
+        
+            # Create the new card (not a Joker)
+            new_monster = Card(rank, suit, is_joker=False)
+        
+            # Add to the deck (using index 0 for the top)
+            self._deck.add_to_top(0, new_monster)
+    
+        # Shuffle so the player doesn't know exactly where the reinforcements are
+        self._deck.shuffle_deck()
     def message(self, prompt: str) -> None:
         m_easy_list = [
                 'A goblin leaps from the shadows!',
@@ -69,10 +92,10 @@ class Scoundrel:
                   'A bloody room houses a longbow and a few arrows, hopefully you can put them to better use.'
                   ]
         w_hard_list = [
-                    'A gilded broadsword leans against the wall, it has seen better and worse days.',
+                    'A gilded broadsword leans against the wall, it thirsts for blood.',
                     'A large hammer glints inside of a nerby chest, it will serve you well.',
                     'In the middle of the room a crossbow sits upon a pedastol, it will pierce any fiend you happen upon.',
-                    'A shield is mounted on the wall, the blades embedded in its edges will surely slice any opponent.'
+                    'A shield is mounted on the wall, the blades embedded in its edges will surely slice through any opponent.'
                 ]
 
         w_easy_list = [
@@ -102,12 +125,111 @@ class Scoundrel:
         else:
             print('HEY PASS AN ACTUAL ARGUMENT!')
 
+
+    def _handle_joker(self, card: Card) -> None:
+        """Handles random outcomes for Joker cards."""
+        event = -1
+        if card.get_suit() in ['Hearts','Diamonds']:
+            event = random.randint(0,3)
+
+            if event == 0:
+                
+                print("""
+                The Goddess T\'lupina blesses you.
+                Your maximum health has increased by 5
+                """)
+                
+                self._max_health += 5
+
+                
+            elif event == 1:
+                
+                print("""
+                Before you enter the room you feel a sweltering heat.
+                As you push open the door you see in front of you
+                the blade of Tvell. It sits embedded in stone,
+                you grab the handle and feel immeasurable power!
+                """)
+                
+                
+                self._durability = 20
+                self._equipped = True
+                
+            elif event == 2:
+                print("""
+                All weapons have 2 more durability.
+                """)
+                self._dura_bonus += 2
+
+            else:
+                
+                print("""
+                You see a small shack in the middle of the enormous
+                room. A man in medical garb walks out and greets you.
+                He treats you with a nice meal and brews you a strange tea.
+                It has a rancid taste and you feel the effects immediately.
+                Whenever you heal you heal 3 more life.
+                """)
+                
+                self._heal_bonus += 3
+
+        if card.get_suit() in ['Spades','Clubs']:
+            event = random.randint(0,3)
+
+            if event == 0:
+                
+                print("""
+                A shudder runs up your spine, you feel watched.
+                Unger's dark eye appears before you.
+                Manacles of shadow manifest around your ankles.
+                You no longer can run from chambers.
+                """)
+                
+                self._cursed = True
+            elif event == 1:
+                
+                print("""As you step in the room the stone you step on
+                slides down ever slightly. Spears shoot out of the walls
+                digging into your flesh as you hurry out.
+                You lose half of your life.""")
+                
+                self._health = self._health//2
+
+            elif event == 2:
+                print("""
+                As you walk into the room you ignorantly trip a wire.
+                Alarm bells ring, alerting all kinds of nasty critters
+                of your presence. Three monsters enter the dungeon.
+                """)
+
+                self._add_monsters_to_deck(3)
+            
+            else:
+                print("""
+                You are engulfed in flames!
+                """)
+                self._on_fire = 3
+
+
+                
+        input("\nPress Enter to continue...\n")
+
     def perform_actions(self, choice: int) -> None:
         chosen = self._row.pop(choice - 1)
+        if self._on_fire > 0:
+            print("\nFlames kiss your flesh.")
+            print(f"You are on fire for {self._on_fire - 1} more turns.\n")
+            self._health -= self._on_fire
+            self._on_fire -= 1
+        
+        # TRIGGER JOKER LOGIC
+        if chosen.is_joker():
+            self._handle_joker(chosen)
+            return # Skip standard card logic
 
-        # Healing action
         if chosen.get_suit() == "Hearts":
-            self._health += chosen.get_value_face()
+            self._health += chosen.get_value_face() + self._heal_bonus
+
             if self._health > self._max_health:
                 self._health = self._max_health
                 if chosen.get_value_face() > 8:
@@ -127,7 +249,7 @@ class Scoundrel:
         # Equip weapon
         elif chosen.get_suit() == "Diamonds":
             self._equip_value = chosen.get_value_face()
-            self._durability = self._equip_value
+            self._durability = self._equip_value + self._dura_bonus
             self._equipped = True
 
             if self._equip_value <= 4:
@@ -231,10 +353,13 @@ class Scoundrel:
                     shuffle_input = input("Do you want to move to another chamber? (You may only do this every other turn.) ")
 
                     if shuffle_input.lower() in ['yes', 'y']:
-                        print("This chamber is too perilous. You turn the corner hoping for better luck.")
-                        self.shuffle_row()
-                        self._shuffled_last_turn = True
-                        active = False
+                        if self._cursed:
+                            print("Unger's foul curse prevents you from running away.")
+                        else:
+                            print("This chamber is too perilous. You turn the corner hoping for better luck.")
+                            self.shuffle_row()
+                            self._shuffled_last_turn = True
+                            active = False
                     elif shuffle_input.lower() in ['no', 'n']:
                         print("You steel your nerves and enter the chamber unchanged.")
                         self._shuffled_last_turn = False
@@ -249,7 +374,17 @@ class Scoundrel:
                             dump = []
                             dump.append(self._deck.draw_card())
                     elif shuffle_input == 'debug_omniscience':
-                        print(Deck()) #<-- doesnt work as intended
+
+                        print("\n--- OMNISCIENCE: REVEALING ALL REMAINING ROOMS ---")
+                        # We access the private list inside the Deck object
+                        # We use [::-1] because pop() takes from the end of the list (the "top")
+                        remaining_cards = self._deck._deck[::-1] 
+                        
+                        for i, card in enumerate(remaining_cards, start=1):
+                            print(f"Room {i}: {card.name_of_card()} ({card.card_type()})")
+                        
+                        print("--- END OF REVEAL ---\n")
+
                     else:
                         print('I do not understand, try again.')
 
