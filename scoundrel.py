@@ -24,8 +24,6 @@ class Scoundrel:
 
         self._shuffled_last_turn: bool = False
 
-   
-
 
     def _add_to_deck(self, count: int, card: str) -> None:
         """Creates new monster cards and shuffles them into the deck."""
@@ -72,12 +70,6 @@ class Scoundrel:
                 self._deck.add_to_top(0, new_monster)
     
                 # Shuffle so the player doesn't know exactly where the reinforcements are
-        
-
-
-
-
-
         self._deck.shuffle_deck()
     
 
@@ -328,10 +320,20 @@ class Scoundrel:
                 print(f"You are attacked! Health reduced to {self._health}.")
                 input("\nPress Enter to continue... \n")
 
+
+            if self._durability <= 0:
+                self._equipped = False
+                self._durability = 0
+
     def create_row(self) -> None:
-        """Draw up to 4 cards in the chamber."""
-        for _ in range(4 - len(self._row)):
-            self._row.append(self._deck.draw_card())
+        """Draw up to 4 cards in the chamber, stopping if the deck is empty."""
+        while len(self._row) < 4:
+            # Check the actual length of the deck list before drawing
+            if self._deck.get_len() > 0:
+                self._row.append(self._deck.draw_card())
+            else:
+                # No more cards left; stop trying to fill the row
+                break
 
     def shuffle_row(self) -> None:
         """Return all current cards to the deck and reshuffle."""
@@ -340,33 +342,43 @@ class Scoundrel:
             self._deck.add_to_top(0, card)
         self._deck.shuffle_deck()
 
-    def print_chamber(self) -> None:
+    def print_chamber(self, hallway_view: bool = False) -> None:
+
         print(f"\n{self._deck.get_len()} rooms remaining\nThe chamber contains:")
+        
         for i, card in enumerate(self._row, start=1):
-            print(f"{i}. {card.name_of_card()} ({card.card_type()})")
+            # 30% chance to obscure IF we are looking from the hallway and cursed
+            if hallway_view and self._cursed and random.random() < 0.30:
+                print(f"{i}. [ ??? ] (The curse obscures your vision)")
+            else:
+                print(f"{i}. {card.name_of_card()} ({card.card_type()})")
 
         if self._equipped:
             print(f'Your weapon has {self._durability} power left.')
         else:
             print(f'You are unarmed.')
-        print(f'You have {self._health} health.')
-        
+        print(f'You have {self._health} health.')       
 
     def chamber_loopable(self) -> None:
-        while not self._shuffled_last_turn and len(self._row) > 1:
-            self.print_chamber()
+        # Allow the loop to continue until the room is EMPTY (0)
+        while self._health > 0 and len(self._row) > 0:
+            if self._shuffled_last_turn:
+                break # Exit if the player chose to run away
+
+            self.print_chamber(hallway_view=False) # Full visibility inside
             try:
-                choice = int(input(f"Which room do you enter first? "))
+                choice = int(input(f"Which room do you enter? "))
                 if 1 <= choice <= len(self._row):
                     self.perform_actions(choice)
                 else:
-                    print("Please choose a valid room, adventurer.")
+                    print("Invalid room number.")
             except ValueError:
-                print("Enter the number of the room you wish to enter.")
+                print("Please enter a number.")
+                
+        # If the room is cleared (0 cards left), we can reset flee status
+        if len(self._row) == 0:
+            self._shuffled_last_turn = False
 
-            if self._health <= 0:
-                print("\nYou have perished in the dungeon...")
-                return
 
     def tutorial(self) -> None:
         print("\nWelcome to Scoundrel!")
@@ -378,7 +390,7 @@ class Scoundrel:
         while self._deck.get_len() > 0 and self._health > 0:
             self.create_row()         
             if not self._shuffled_last_turn:
-                self.print_chamber()
+                self.print_chamber(hallway_view=True)
                 input("\nPress Enter to continue... \n")
             
 
@@ -393,13 +405,12 @@ class Scoundrel:
                     shuffle_input = input("Do you want to move to another chamber? (You may only do this every other turn.) ")
 
                     if shuffle_input.lower() in ['yes', 'y']:
-                        if self._cursed:
-                            print("Unger's foul curse prevents you from running away.")
-                        else:
-                            print("This chamber is too perilous. You turn the corner hoping for better luck.")
-                            self.shuffle_row()
-                            self._shuffled_last_turn = True
-                            active = False
+
+                        print("This chamber is too perilous. You turn the corner hoping for better luck.")
+                        self.shuffle_row()
+                        self._shuffled_last_turn = True
+                        active = False
+            
                     elif shuffle_input.lower() in ['no', 'n']:
                         print("You steel your nerves and enter the chamber unchanged.")
                         self._shuffled_last_turn = False
