@@ -41,3 +41,22 @@ class Deck:
 
     def __str__(self) -> str:
         return f"Deck of {len(self._deck)} cards"
+
+        # Inside your Deck class in deck.py
+    def remove_specific_cards(self, suit_name: str, count: int) -> None:
+        """
+        Filters out a specific number of cards of a given suit.
+        """
+        new_deck = []
+        removed_count = 0
+        
+        # Iterate through the current internal list
+        for card in self._deck:
+            if card.get_suit() == suit_name and removed_count < count:
+                removed_count += 1
+                continue  # Do not add to the new list
+            new_deck.append(card)
+        
+        # Replace the old list with the filtered one
+        self._deck = new_deck
+        self.shuffle_deck()

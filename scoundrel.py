@@ -20,28 +20,67 @@ class Scoundrel:
         self._dura_bonus: int = 0
         self._cursed: bool = False
         self._on_fire: int = 0
+        self._class: str = 'sco'
 
         self._shuffled_last_turn: bool = False
 
+   
 
 
-    def _add_monsters_to_deck(self, count: int) -> None:
+    def _add_to_deck(self, count: int, card: str) -> None:
         """Creates new monster cards and shuffles them into the deck."""
         monster_suits = ["Clubs", "Spades"]
-    
-        for _ in range(count):
-            # Generate a random rank (1-10 to stay within standard monster values)
-            rank = random.randint(1, 10)
-            suit = random.choice(monster_suits)
+        suits = ["Clubs","Spades","Hearts","Diamonds"]
+
+        if card == 'monster':
+            for _ in range(count):
+                # Generate a random rank (A-K) to stay within standard monster values)
+                rank = random.randint(0, 12)
+                suit = random.choice(monster_suits)
         
-            # Create the new card (not a Joker)
-            new_monster = Card(rank, suit, is_joker=False)
+                # Create the new card (not a Joker)
+                new_monster = Card(rank, suit, is_joker=False)
         
-            # Add to the deck (using index 0 for the top)
-            self._deck.add_to_top(0, new_monster)
+                # Add to the deck (using index 0 for the top)
+                self._deck.add_to_top(0, new_monster)
     
-        # Shuffle so the player doesn't know exactly where the reinforcements are
+                # Shuffle so the player doesn't know exactly where the reinforcements are
+        elif card == 'joker':
+            for _ in range(count):
+                # Generate a random rank (A-K) to stay within standard monster values)
+                rank = random.randint(0, 12)
+                suit = random.choice(suits)
+        
+                # Create the new card (Joker)
+                new_monster = Card(rank, suit, is_joker=True)
+        
+                # Add to the deck (using index 0 for the top)
+                self._deck.add_to_top(0, new_monster)
+    
+                # Shuffle so the player doesn't know exactly where the reinforcements are
+        
+        elif card == 'weapon':
+            for _ in range(count):
+                # Generate a random rank (A-K) to stay within standard monster values)
+                rank = random.randint(0, 12)
+                suit = "Diamonds"
+        
+                # Create the new card (not a Joker)
+                new_monster = Card(rank, suit, is_joker=False)
+        
+                # Add to the deck (using index 0 for the top)
+                self._deck.add_to_top(0, new_monster)
+    
+                # Shuffle so the player doesn't know exactly where the reinforcements are
+        
+
+
+
+
+
         self._deck.shuffle_deck()
+    
+
     def message(self, prompt: str) -> None:
         m_easy_list = [
                 'A goblin leaps from the shadows!',
@@ -140,6 +179,7 @@ class Scoundrel:
                 """)
                 
                 self._max_health += 5
+                self._health += 5
 
                 
             elif event == 1:
@@ -202,7 +242,7 @@ class Scoundrel:
                 of your presence. Three monsters enter the dungeon.
                 """)
 
-                self._add_monsters_to_deck(3)
+                self._add_to_deck(3,'monster')
             
             else:
                 print("""
@@ -394,9 +434,88 @@ class Scoundrel:
             print("\nThe dungeon grows quiet. You have survived your journey!")
         else:
             print('\n The dungeon grows ever louder. You have failed your journey. ')
+    
+    def characters(self) -> None:
+        print('In scoundrel you can select a character.\n')
+        print('Each character has upsides and downsides.\n')
+        looping_c = True
+
+        while looping_c:
+            print('Characters:')
+            char_inq = str(input(
+            """
+        1. Scoundrel
+        2. Thief
+        3. Cleric
+        4. Veteran
+        5. Jester
+
+Which Character would you like to learn about? (1-5)\n\n"""))
+            if char_inq.lower() in ['1','Scoundrel']: #sco
+                print('  The base experience, no bonuses no downsides\n')
+                class_conf = 'sco'
+
+            elif char_inq.lower() in ['2','Thief']:
+                print('  Three more weapons are added to the dungeon\n  but all weapons have 2 less durability.\n')
+                class_conf = 'thi'
+
+            elif char_inq.lower() in ['3','Cleric']:
+                print('  You heal 2 more and start with 3 more health\n  but there are two less healing rooms and one less weapon room.\n')
+                class_conf = 'cle'
+
+            elif char_inq.lower() in ['4','Veteran']:
+                print('  You start with a 10 durability weapon\n  but enter with 10 less health.\n')
+                class_conf = 'vet'
+
+            elif char_inq.lower() in ['5','Jester']:
+                print('  Adds four Joker rooms to dungeon\n  Joker rooms are both negative and positive mystery events.\n')
+                class_conf = 'jes'
+            else:
+                print('I don\'t understand.')
+                print('Do you want to play as the Scoundrel?\n')
+                class_conf = 'sco'
+
+            conf = input("Do you want to play as this character? (y/n)\n")
+            if conf.lower() in ['y', 'yes']:
+                self._class = class_conf
+                looping_c = False
+
+
+    
+    # Inside your Scoundrel class in scoundrel.py
+
+    def _apply_character_logic(self) -> None:
+        """Applies character-specific deck changes and stat modifiers."""
+        
+        if self._class == 'thi':  # Thief
+            # Adds 3 extra monsters to the deck
+            self._add_to_deck(3, 'weapon') 
+            # Line 276: self._durability = self._equip_value + self._dura_bonus
+            self._dura_bonus = -2
+
+        elif self._class == 'cle':  # Cleric
+            self._heal_bonus = 2
+            self._max_health = 23
+            self._health = 23
+            # Use the NEW method we added to the Deck class
+            self._deck.remove_specific_cards("Hearts", 2)
+            self._deck.remove_specific_cards("Diamonds", 1)
+
+        elif self._class == 'vet':  # Veteran
+            self._equipped = True
+            self._equip_value = 10
+            self._durability = 10
+            self._health = 10
+
+        elif self._class == 'jes':  # Jester
+            self._add_to_deck(4, 'joker')
+
+        # One final shuffle to mix in any added monsters/jokers
+        self._deck.shuffle_deck()
 
     def play(self) -> None:
         self.tutorial()
-        self.main_options()
-
+        self.characters()             # Sets self._class
+        self._apply_character_logic()  # Applies the changes
+        self.main_options()            # Starts the game loop
 
